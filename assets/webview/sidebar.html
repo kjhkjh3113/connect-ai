@@ -1346,8 +1346,9 @@ body.corp-on .agent-dock::before{
   font-size:11px;color:rgba(251,191,36,.55);font-style:italic;padding:6px;
 }
 
+#cloudBtn.cloud-connected{color:var(--accent);border-color:var(--accent);box-shadow:0 0 12px var(--accent-glow)}
 </style></head><body class="init">
-<div class="header"><div class="header-left"><div class="logo">✦</div><span class="brand">Connect AI</span><span class="brand-suffix" id="brandSuffix"></span></div><div class="header-right"><select id="modelSel"></select><button class="ad-chip" id="adChip" type="button" data-expanded="false" title="specialist 모델 매핑 — 클릭해서 펼치기"><span class="adc-model" id="adcModel">…</span><span class="adc-caret">▾</span></button><button class="btn-icon" id="corporateBtn" title="AI 1인 기업 모드 (Solo Mode) — 나만의 에이전트 팀이 자동으로 일합니다 (현재: OFF)" style="opacity:0.5">👔</button><button class="btn-icon" id="brainBtn" title="내 지식 관리">🧠</button><button class="btn-icon" id="historyBtn" title="이전 대화 보기 — 새 대화를 시작해도 이전 대화는 자동 보관됩니다">📂</button><button class="btn-icon" id="newChatBtn" title="새 대화 시작 (이전 대화는 자동 보관)">+</button><div class="more-wrap"><button class="btn-icon" id="moreBtn" title="더보기">…</button><div class="more-menu" id="moreMenu" hidden><button class="more-item" id="internetBtn" title="DuckDuckGo로 웹 검색 — AI가 결과를 읽어와 답변에 반영">🌐 인터넷 검색</button><button class="more-item" id="thinkingBtn" title="AI의 사고 흐름을 별도 패널에 그래프로 시각화 (지식 노드 연결 표시)">🎬 Thinking 시각화</button><button class="more-item" id="skillLibBtn" title="에이전트 스킬·도구 카탈로그 — 내가 만든 것 + 기본 제공 모두 한 곳에서">🛠 내 스킬 라이브러리</button><button class="more-item" id="settingsBtn" title="모델·서버 주소·시스템 프롬프트·키 등 모든 설정">⚙️ 설정</button></div></div></div></div>
+<div class="header"><div class="header-left"><div class="logo">✦</div><span class="brand">Connect AI</span><span class="brand-suffix" id="brandSuffix"></span></div><div class="header-right"><select id="modelSel"></select><button class="ad-chip" id="adChip" type="button" data-expanded="false" title="specialist 모델 매핑 — 클릭해서 펼치기"><span class="adc-model" id="adcModel">…</span><span class="adc-caret">▾</span></button><button class="btn-icon" id="corporateBtn" title="AI 1인 기업 모드 (Solo Mode) — 나만의 에이전트 팀이 자동으로 일합니다 (현재: OFF)" style="opacity:0.5">👔</button><button class="btn-icon" id="brainBtn" title="내 지식 관리">🧠</button><button class="btn-icon" id="historyBtn" title="이전 대화 보기 — 새 대화를 시작해도 이전 대화는 자동 보관됩니다">📂</button><button class="btn-icon" id="newChatBtn" title="새 대화 시작 (이전 대화는 자동 보관)">+</button><button class="btn-icon" id="cloudBtn" title="클라우드 연결">☁️</button><div class="more-wrap"><button class="btn-icon" id="moreBtn" title="더보기">…</button><div class="more-menu" id="moreMenu" hidden><button class="more-item" id="internetBtn" title="DuckDuckGo로 웹 검색 — AI가 결과를 읽어와 답변에 반영">🌐 인터넷 검색</button><button class="more-item" id="thinkingBtn" title="AI의 사고 흐름을 별도 패널에 그래프로 시각화 (지식 노드 연결 표시)">🎬 Thinking 시각화</button><button class="more-item" id="skillLibBtn" title="에이전트 스킬·도구 카탈로그 — 내가 만든 것 + 기본 제공 모두 한 곳에서">🛠 내 스킬 라이브러리</button><button class="more-item" id="settingsBtn" title="모델·서버 주소·시스템 프롬프트·키 등 모든 설정">⚙️ 설정</button></div></div></div></div>
 <!-- v2.89.116 — 1인 기업 모드 specialist 모델 dock. 일반 모드에선 숨김.
      body.corp-on이 들어오면 헤더의 #modelSel 자리에서 9명 specialist의
      모델 매핑이 한 줄로 보이고, 클릭하면 인라인 popover로 변경. -->
@@ -1402,7 +1403,7 @@ const vscode=acquireVsCodeApi(),chat=document.getElementById('chat'),input=docum
 sendBtn=document.getElementById('sendBtn'),stopBtn=document.getElementById('stopBtn'),
 modelSel=document.getElementById('modelSel'),newChatBtn=document.getElementById('newChatBtn'),settingsBtn=document.getElementById('settingsBtn'),brainBtn=document.getElementById('brainBtn'),thinkingBtn=document.getElementById('thinkingBtn'),
 internetBtn=document.getElementById('internetBtn'),attachBtn=document.getElementById('attachBtn'),injectLocalBtn=document.getElementById('injectLocalBtn'),fileInput=document.getElementById('fileInput'),attachPreview=document.getElementById('attachPreview'),
-thinkingBar=document.getElementById('thinkingBar'),corporateBtn=document.getElementById('corporateBtn'),agentBoard=document.getElementById('agentBoard'),abGrid=document.getElementById('abGrid'),abSvg=document.getElementById('abSvg'),abFolder=document.getElementById('abFolder'),abCompanyName=document.getElementById('abCompanyName'),abFolderText=document.getElementById('abFolderText'),brandSuffix=document.getElementById('brandSuffix');
+thinkingBar=document.getElementById('thinkingBar'),corporateBtn=document.getElementById('corporateBtn'),agentBoard=document.getElementById('agentBoard'),abGrid=document.getElementById('abGrid'),abSvg=document.getElementById('abSvg'),abFolder=document.getElementById('abFolder'),abCompanyName=document.getElementById('abCompanyName'),abFolderText=document.getElementById('abFolderText'),brandSuffix=document.getElementById('brandSuffix'),cloudBtn=document.getElementById('cloudBtn');
 let loader=null,sending=false,pendingFiles=[],internetEnabled=false,corporateMode=false,officeOpen=false;
 /* Smart auto-scroll: only stick to the bottom if the user is already near it.
    If they scrolled up to read earlier messages, leave their view alone. */
@@ -2018,6 +2019,7 @@ document.addEventListener('click',e=>{if(e.target.classList.contains('qa-btn')){
 sendBtn.addEventListener('click',send);
 input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
 newChatBtn.addEventListener('click',()=>vscode.postMessage({type:'newChat'}));
+cloudBtn.addEventListener('click',()=>vscode.postMessage({type:'cloudToggle'}));
 /* v2.89.106-107 — 대화 세션 아카이브 패널. 매 newChat 시 이전 대화 자동 보관.
    복원 후 이어 대화하면 같은 세션 ID로 update (중복 방지). 현재 활성 세션은
    리스트에서 강조 표시. */
@@ -5088,6 +5090,15 @@ window.addEventListener('message',e=>{const msg=e.data;switch(msg.type){
   case 'telegramSent':{
     /* 사이드바에서는 작은 banner */
     addCorpBanner && addCorpBanner('📱 Secretary가 텔레그램으로 보고를 보냈어요.');
+    break;
+  }
+  case 'cloudStatus':{
+    if(cloudBtn){
+      cloudBtn.style.opacity = msg.connected ? '1' : '0.5';
+      cloudBtn.className = msg.connected ? 'btn-icon cloud-connected' : 'btn-icon';
+      cloudBtn.title = msg.connected ? '☁️ 클라우드 연결됨 ('+(msg.model||'')+')' : '☁️ 클라우드 연결 안됨 — 클릭해서 재시도';
+      modelSel.value = msg.model || modelSel.value;
+    }
     break;
   }
 } });

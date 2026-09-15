@@ -8625,6 +8625,12 @@ export function activate(context: vscode.ExtensionContext) {
     refreshAprBadge();
     context.subscriptions.push(aprStatusBar);
     setInterval(refreshAprBadge, 8000);
+    const bridgeStatusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 90);
+    bridgeStatusBar.text = '$(cloud) Bridge: 🔴';
+    bridgeStatusBar.tooltip = 'Local AI Bridge — OFF';
+    bridgeStatusBar.command = 'connectAiLab.bridgeToggle';
+    bridgeStatusBar.show();
+    context.subscriptions.push(bridgeStatusBar);
     context.subscriptions.push(
         vscode.commands.registerCommand('connectAiLab.youtube.connectOAuth', async () => {
             const r = await startYouTubeOAuthFlow();
@@ -8652,6 +8658,23 @@ export function activate(context: vscode.ExtensionContext) {
         /* v2.89.137 — 매출 대시보드 (PayPal 시각화) */
         vscode.commands.registerCommand('connectAiLab.revenueDashboard.open', () => {
             RevenueDashboardPanel.createOrShow();
+        }),
+        vscode.commands.registerCommand('connectAiLab.bridgeToggle', async () => {
+            try {
+                const response = await axios.get('http://localhost:8192/health', { timeout: 3000 });
+                const connected = response.status === 200 && response.data?.status === 'ok';
+                bridgeStatusBar.text = connected ? '$(cloud) Bridge: 🟢' : '$(cloud) Bridge: 🔴';
+                bridgeStatusBar.tooltip = connected ? 'Local AI Bridge — Connected' : 'Local AI Bridge — Disconnected';
+                if (_activeChatProvider && _activeChatProvider._view) {
+                    _activeChatProvider._view.webview.postMessage({ type: 'cloudStatus', connected: connected, model: connected ? 'deepseek-cloud' : 'local' });
+                }
+            } catch {
+                bridgeStatusBar.text = '$(cloud) Bridge: 🔴';
+                bridgeStatusBar.tooltip = 'Local AI Bridge — Disconnected';
+                if (_activeChatProvider && _activeChatProvider._view) {
+                    _activeChatProvider._view.webview.postMessage({ type: 'cloudStatus', connected: false });
+                }
+            }
         })
     );
     context.subscriptions.push(
@@ -17788,6 +17811,16 @@ class SidebarChatProvider implements vscode.WebviewViewProvider {
                         await this._handlePrompt(this._lastPrompt, this._lastModel || '');
                     }
                     break;
+                case 'cloudToggle': {
+                    try {
+                        const response = await axios.get('http://localhost:8192/health', { timeout: 3000 });
+                        const connected = response.status === 200 && response.data?.status === 'ok';
+                        webviewView.webview.postMessage({ type: 'cloudStatus', connected: connected, model: connected ? 'deepseek-cloud' : 'local' });
+                    } catch {
+                        webviewView.webview.postMessage({ type: 'cloudStatus', connected: false });
+                    }
+                    break;
+                }
             }
             } catch (msgErr: any) {
                 /* v2.89.97 — 메시지 처리 중 어떤 예외든 잡힘. 사용자에게 정확한
